@@ -7,4 +7,7 @@ RUN chmod +x start.sh
 
 EXPOSE 10000
 
-CMD ["./start.sh"]
+# Base image ke default entrypoint ko override karne ke liye:
+ENTRYPOINT []
+
+CMD ["/bin/sh", "/app/start.sh"]
