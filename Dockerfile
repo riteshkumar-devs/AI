@@ -7,7 +7,9 @@ RUN apt-get update && apt-get install -y \
     cmake \
     build-essential \
     wget \
-    curl
+    curl \
+    libssl-dev \
+    pkg-config
 
 WORKDIR /app
 
@@ -15,7 +17,7 @@ RUN git clone https://github.com/ggml-org/llama.cpp.git
 
 WORKDIR /app/llama.cpp
 
-RUN cmake -B build
+RUN cmake -B build -DLLAMA_OPENSSL=ON
 RUN cmake --build build -j4
 
 WORKDIR /app
