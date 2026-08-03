@@ -9,16 +9,25 @@ RUN apt-get update && apt-get install -y \
     wget \
     curl \
     libssl-dev \
-    pkg-config
+    pkg-config && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-RUN git clone https://github.com/ggml-org/llama.cpp.git
+# Shallow clone to avoid network failure/timeouts
+RUN git clone --depth 1 https://github.com/ggml-org/llama.cpp.git
 
 WORKDIR /app/llama.cpp
 
-RUN cmake -B build -DLLAMA_OPENSSL=ON
-RUN cmake --build build -j4
+# Disable CPU instruction sets that cause SIGILL on cloud instances
+RUN cmake -B build \
+    -DGGML_AVX=OFF \
+    -DGGML_AVX2=OFF \
+    -DGGML_FMA=OFF \
+    -DGGML_AMX=OFF \
+    -DLLAMA_OPENSSL=ON
+
+RUN cmake --build build --config Release -j$(nproc)
 
 WORKDIR /app
 
